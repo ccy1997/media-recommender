@@ -78,9 +78,9 @@ def extract_books(start_id, end_id):
 ##Test things
 ##ia = IMDb()
 ##print(ia.get_movie_infoset())
-##ex1 = ia.get_movie('0100000', info=['main', 'synopsis', 'plot', 'vote details'])
+##ex1 = ia.get_movie('0120004', info=['main', 'synopsis', 'plot', 'vote details'])
 ##ex2 = ia.get_movie('0133093', info=['main', 'synopsis', 'plot'])
-##print('synopsis' in ex1)
+##print(ex1['synopsis'])
 ##print(type(ex2['synopsis'][0]))
 ##print(ia.get_movie_infoset())
 ##print(ex2.infoset2keys)
