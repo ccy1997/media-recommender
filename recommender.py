@@ -2,7 +2,7 @@ from enum import Enum
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import pandas as pd
-from collections import Counter 
+from collections import Counter
 
 
 class Media(Enum):

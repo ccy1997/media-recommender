@@ -1,4 +1,4 @@
-id,goodreads_id,title,isbn,isbn13,documents
+id,goodreads_id,title,isbn,isbn13,vector
 0,1,Harry Potter and the Half-Blood Prince Harry Potter ,0439785960,9780439785969,"3.97001902e-02  6.05363846e-02  1.81488196e-02  6.57342275e-02
  -4.62951660e-02  4.38836416e-02  6.22011820e-02 -9.85228221e-02
   9.01902517e-02  4.24336592e-02  1.21850967e-02 -8.10925166e-02
