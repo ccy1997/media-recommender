@@ -71,6 +71,7 @@ def preprocess_item_documents(in_file_str, out_file_str):
             item_remove_id.append(item_df.index[i])
 
     item_df.drop(item_remove_id, inplace=True)
+    item_df.rename(columns = {'documents':'words'}, inplace=True)
     item_df.to_csv(out_file_str, sep=',', encoding='utf-8')
 
 

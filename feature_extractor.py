@@ -22,10 +22,10 @@ def vectorize_items(in_file_str, out_file_str, model):
 
     for i, row in item_df.iterrows():
         print( 'Vectorizing {}: id = {}'.format(in_file_str, str(i)) )
-        word_list = row['documents'].split(' ')
-        item_df.at[i, 'documents'] = np.array2string(calculate_item_vector(word_list, model.vector_size, model)).strip(' []')
+        word_list = row['words'].split(' ')
+        item_df.at[i, 'words'] = np.array2string(calculate_item_vector(word_list, model.vector_size, model)).strip(' []')
 
-    item_df.rename(columns = {'documents':'vector'}, inplace=True)
+    item_df.rename(columns = {'words':'vector'}, inplace=True)
     item_df.to_csv(out_file_str, sep=',', encoding='utf-8')
 
 
