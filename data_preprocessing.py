@@ -3,6 +3,7 @@ import pandas as pd
 import re
 from nltk.stem import WordNetLemmatizer
 from bs4 import BeautifulSoup
+from parameters import Parameters
 
 
 def extract_nouns_and_adjs(tokenized_text):
@@ -67,7 +68,7 @@ def preprocess_item_documents(in_file_str, out_file_str):
         keywords = ' '.join([preprocess_text(d) for d in documents])
         item_df.at[i, 'documents'] = keywords
 
-        if  pd.isna(item_df.at[i, 'title']) or pd.isna(item_df.at[i, 'documents']):
+        if item_df.at[i, 'title'] == '' or item_df.at[i, 'documents'] == '':
             item_remove_id.append(item_df.index[i])
 
     item_df.drop(item_remove_id, inplace=True)
@@ -76,9 +77,12 @@ def preprocess_item_documents(in_file_str, out_file_str):
 
 
 def main():
-    preprocess_item_documents('unprocessed_movies.csv', 'preprocessed_movies.csv')
-    preprocess_item_documents('unprocessed_games.csv', 'preprocessed_games.csv')
-    preprocess_item_documents('unprocessed_books.csv', 'preprocessed_books.csv')
+    preprocess_item_documents(Parameters.data_folder_path + Parameters.raw_movie_csv_name,
+                                Parameters.data_folder_path + Parameters.preprocessed_movie_csv_name)
+    preprocess_item_documents(Parameters.data_folder_path + Parameters.raw_game_csv_name, 
+                                Parameters.data_folder_path + Parameters.preprocessed_game_csv_name)
+    preprocess_item_documents(Parameters.data_folder_path + Parameters.raw_book_csv_name, 
+                                Parameters.data_folder_path + Parameters.preprocessed_book_csv_name)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import gensim
 import numpy as np
 import pandas as pd
+from parameters import Parameters
 
 
 def calculate_item_vector(word_list, d, model):
@@ -35,9 +36,12 @@ def main():
     model = gensim.models.KeyedVectors.load_word2vec_format( './GoogleNews-vectors-negative300.bin', binary=True)
 
     # Vectorize items by corresponding keywords
-    vectorize_items('preprocessed_movies.csv', 'vectorized_movies.csv', model)
-    vectorize_items('preprocessed_games.csv', 'vectorized_games.csv', model)
-    vectorize_items('preprocessed_books.csv', 'vectorized_books.csv', model)
+    vectorize_items(Parameters.data_folder_path + Parameters.preprocessed_movie_csv_name, 
+                    Parameters.data_folder_path + Parameters.vectorized_movie_csv_name, model)
+    vectorize_items(Parameters.data_folder_path + Parameters.preprocessed_game_csv_name, 
+                    Parameters.data_folder_path + Parameters.vectorized_game_csv_name, model)
+    vectorize_items(Parameters.data_folder_path + Parameters.preprocessed_book_csv_name, 
+                    Parameters.data_folder_path + Parameters.vectorized_book_csv_name, model)
 
 
 if __name__ == '__main__':

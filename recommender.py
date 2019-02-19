@@ -3,7 +3,7 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import pandas as pd
 from collections import Counter
-
+from parameters import Parameters
 
 class Media(Enum):
     MOVIE = 'movie'
@@ -85,9 +85,9 @@ def read_vectorized_items(in_file_name):
 
 def main():
     # Read item's data
-    movies_df = read_vectorized_items('vectorized_movies.csv')
-    games_df = read_vectorized_items('vectorized_games.csv')
-    books_df = read_vectorized_items('vectorized_books.csv')
+    movies_df = read_vectorized_items(Parameters.data_folder_path + Parameters.vectorized_movie_csv_name)
+    games_df = read_vectorized_items(Parameters.data_folder_path + Parameters.vectorized_game_csv_name)
+    books_df = read_vectorized_items(Parameters.data_folder_path + Parameters.vectorized_book_csv_name)
     
     # Read user rating's data
     users_ratings_df = pd.read_csv('./users_ratings.csv')

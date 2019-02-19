@@ -7,6 +7,7 @@ import pandas as pd
 import xml.sax
 import requests
 import untangle
+from parameters import Parameters
 
 
 def extract_movies_and_tv_shows(start_id, end_id):
@@ -30,7 +31,7 @@ def extract_movies_and_tv_shows(start_id, end_id):
         except urllib.error.HTTPError as e:
             print(e)
 
-    movie_df.to_csv('unprocessed_movies.csv', index=False, sep=',', encoding='utf-8')  
+    movie_df.to_csv(Parameters.data_folder_path + Parameters.raw_movie_csv_name, index=False, sep=',', encoding='utf-8')  
 
 
 def extract_games(start_offset, end_offset):
@@ -48,7 +49,7 @@ def extract_games(start_offset, end_offset):
                 documents = game['description'] + '::' + game['deck']
                 game_df.loc[len(game_df)] = [len(game_df), game['id'], game['name'], documents]
 
-    game_df.to_csv('unprocessed_games.csv', index=False, sep=',', encoding='utf-8')
+    game_df.to_csv(Parameters.data_folder_path + Parameters.raw_game_csv_name, index=False, sep=',', encoding='utf-8')
 
 
 def extract_books(start_id, end_id):
@@ -73,10 +74,19 @@ def extract_books(start_id, end_id):
         except xml.sax.SAXParseException as e:
             print(e)
 
-    book_df.to_csv('unprocessed_books.csv', index=False, sep=',', encoding='utf-8')
+    book_df.to_csv(Parameters.data_folder_path + Parameters.raw_book_csv_name, index=False, sep=',', encoding='utf-8')
+
+def main():
+    extract_movies_and_tv_shows(120000, 120200)
+    extract_games(0, 500)
+    extract_books(1, 50)
 
 
-# Test things
+if __name__ == '__main__':
+    main()
+
+
+# For debugging
 # ia = IMDb()
 # print(ia.get_movie_infoset())
 # ex1 = ia.get_movie('0120004', info=['main', 'synopsis', 'plot', 'vote details'])
@@ -87,13 +97,3 @@ def extract_books(start_id, end_id):
 # print(ia.get_movie_infoset())
 # print(ex1.infoset2keys)
 # print(ex2['kind'])
-
-
-def main():
-    extract_movies_and_tv_shows(120000, 120020)
-    extract_games(0, 500)
-    extract_books(1, 20)
-
-
-if __name__ == '__main__':
-    main()
