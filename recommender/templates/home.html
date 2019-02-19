@@ -1,5 +1,28 @@
 {% extends "layout.html" %}
 {% block content %}
-  <h1>Media Recommender</h1>
-  <p>Add any movies/tv shows/games/books you like</p>
+  <div class="jumbotron text-center h-25">
+    <h1>Media Recommender</h1>
+    <p>A recommendation engine for movies, games and books</p>
+  </div>
+  <div class="container h-75">
+    <div class="row">
+      <div class="col-sm-12">
+        <!-- Search form -->
+        <input class="form-control" type="text" placeholder="Search for a movie, game or book title" aria-label="Search">
+      </div>
+    </div>
+    <div class="row h-75 align-items-center">
+      <div class="col-sm-12 text-center">
+        <p class="text-info">Add a maximum of 20 titles you enjoy</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6 text-center">
+        <button type="button" class="btn btn-dark btn-block">Submit</button>
+      </div>
+      <div class="col-sm-6 text-center">
+        <button type="button" class="btn btn-dark btn-block">Reset</button>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
