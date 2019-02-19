@@ -23,11 +23,11 @@ class Recommender:
         item_vectors = []
 
         if media_type == Media.MOVIE:
-            item_vectors = np.stack(self.movies_df['documents'].values)
+            item_vectors = np.stack(self.movies_df['vector'].values)
         elif media_type == Media.GAME:
-            item_vectors = np.stack(self.games_df['documents'].values)
+            item_vectors = np.stack(self.games_df['vector'].values)
         elif media_type == Media.BOOK:
-            item_vectors = np.stack(self.books_df['documents'].values)
+            item_vectors = np.stack(self.books_df['vector'].values)
         else:
             print('Unknown media type: generate_k_recommendations')
             return
@@ -52,11 +52,11 @@ class Recommender:
             item_vector = []
 
             if Media(row['type']) == Media.MOVIE:
-                item_vector = self.movies_df.at[row['item_id'], 'documents']
+                item_vector = self.movies_df.at[row['item_id'], 'vector']
             elif Media(row['type']) == Media.GAME:
-                item_vector = self.games_df.at[row['item_id'], 'documents']
+                item_vector = self.games_df.at[row['item_id'], 'vector']
             elif Media(row['type']) == Media.BOOK:
-                item_vector = self.books_df.at[row['item_id'], 'documents']
+                item_vector = self.books_df.at[row['item_id'], 'vector']
             else:
                 print('Unknown media type: extract_user_vectors')
                 return
@@ -79,7 +79,7 @@ class Recommender:
 def read_vectorized_items(in_file_name):
     item_df = pd.read_csv('./' + in_file_name)
     item_df.set_index('id', inplace=True)
-    item_df['documents'] = [np.fromstring(row['documents'], dtype=float, sep=' ') for i, row in item_df.iterrows()]
+    item_df['vector'] = [np.fromstring(row['vector'], dtype=float, sep=' ') for i, row in item_df.iterrows()]
     return item_df
 
 
@@ -90,7 +90,7 @@ def main():
     books_df = read_vectorized_items(Parameters.data_folder_path + Parameters.vectorized_book_csv_name)
     
     # Read user rating's data
-    users_ratings_df = pd.read_csv('./users_ratings.csv')
+    users_ratings_df = pd.read_csv(Parameters.data_folder_path + Parameters.users_ratings_csv_name)
 
     # Create a Recommender object
     recommender = Recommender(movies_df, games_df, books_df, users_ratings_df)

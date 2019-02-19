@@ -10,4 +10,5 @@ class Parameters:
     vectorized_movie_csv_name = 'vectorized_movies.csv'
     vectorized_game_csv_name = 'vectorized_games.csv'
     vectorized_book_csv_name = 'vectorized_books.csv'
+    users_ratings_csv_name = 'users_ratings.csv'
     data_folder_path = './data/'
