@@ -1,3 +1,17 @@
 html, body {
     height: 100%;
 }
+
+input::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+#search_results {
+    position: absolute;
+    z-index: 2; /* So buttons in favorites won't cover those in search results when focused*/
+}
+
+#favorites_and_recommendation {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}

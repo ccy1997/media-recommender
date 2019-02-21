@@ -3,6 +3,7 @@
 from recommender import db
 from recommender.models import Movie, Game, Book
 import pandas as pd
+from parameters import Parameters
 
 # Clear the database first
 db.drop_all()
@@ -11,11 +12,11 @@ db.drop_all()
 db.create_all()
 
 # Read items in DataFrame
-movie_df = pd.read_csv('./vectorized_movies.csv')
+movie_df = pd.read_csv(Parameters.data_folder_path + Parameters.vectorized_movie_csv_name)
 movie_df.set_index('id', inplace=True)
-game_df = pd.read_csv('./vectorized_games.csv')
+game_df = pd.read_csv(Parameters.data_folder_path + Parameters.vectorized_game_csv_name)
 game_df.set_index('id', inplace=True)
-book_df = pd.read_csv('./vectorized_books.csv')
+book_df = pd.read_csv(Parameters.data_folder_path + Parameters.vectorized_book_csv_name)
 book_df.set_index('id', inplace=True)
 
 # Populate movie table
@@ -59,6 +60,6 @@ for i, row in book_df.iterrows():
 db.session.commit()
 
 # Test stuff
-# print(Movie.query.all())
-# print(Game.query.all())
-# print(Book.query.first())
+print(Movie.query.all())
+print(Game.query.all())
+print(Book.query.first())

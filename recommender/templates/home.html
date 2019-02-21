@@ -7,13 +7,18 @@
   <div class="container h-75">
     <div class="row">
       <div class="col-sm-12">
-        <!-- Search form -->
-        <input class="form-control" type="text" placeholder="Search for a movie, game or book title" aria-label="Search">
+        <input id="search" class="form-control" type="text" list="search_results" placeholder="Search for a movie, game or book title" autocomplete="off" oninput="search()" onfocusout="clearSearchResults()">
+        <div id="search_results" class="list-group"></div>
       </div>
     </div>
-    <div class="row h-75 align-items-center">
-      <div class="col-sm-12 text-center">
-        <p class="text-info">Add a maximum of 20 titles you enjoy</p>
+    <div id="favorites_and_recommendation" class="row h-75">
+      <div class="col-sm-6 text-center">
+        <h2>Favorites</h2>
+        <div id="favorites" class="list-group"></div>
+      </div>
+      <div class="col-sm-6 text-center">
+        <h2>Recommendation</h2>
+        <div id="recommendation" class="list-group"></div>
       </div>
     </div>
     <div class="row">
@@ -21,7 +26,7 @@
         <button type="button" class="btn btn-dark btn-block">Submit</button>
       </div>
       <div class="col-sm-6 text-center">
-        <button type="button" class="btn btn-dark btn-block">Reset</button>
+        <button type="button" class="btn btn-dark btn-block" onclick="resetFavorites()">Reset</button>
       </div>
     </div>
   </div>
