@@ -1,17 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div class="jumbotron text-center h-25">
+  <div id="jumbotron_main" class="jumbotron text-center">
     <h1>Media Recommender</h1>
     <p>A recommendation engine for movies, games and books</p>
   </div>
-  <div class="container h-75">
+  <div class="container">
     <div class="row">
       <div class="col-sm-12">
         <input id="search" class="form-control" type="text" list="search_results" placeholder="Search for a movie, game or book title" autocomplete="off" oninput="search()" onfocusout="clearSearchResults()">
         <div id="search_results" class="list-group"></div>
       </div>
     </div>
-    <div id="favorites_and_recommendation" class="row h-75">
+    <div id="favorites_and_recommendation" class="row">
       <div class="col-sm-6 text-center">
         <h2>Favorites</h2>
         <div id="favorites" class="list-group"></div>

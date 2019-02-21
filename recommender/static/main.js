@@ -60,6 +60,7 @@ function update_favorites_display() {
         button.classList.add('list-group-item-action');
         button.value = title;
         button.textContent = title + ' (' + type + ')';
+        button.draggable = true;
         document.getElementById('favorites').appendChild(button);
     }
 }

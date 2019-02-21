@@ -1,5 +1,5 @@
-html, body {
-    height: 100%;
+#jumbotron_main {
+    height: 250px;
 }
 
 input::-webkit-calendar-picker-indicator {
@@ -12,6 +12,18 @@ input::-webkit-calendar-picker-indicator {
 }
 
 #favorites_and_recommendation {
+    height: 500px;
     margin-top: 25px;
     margin-bottom: 25px;
+}
+
+#favorites {
+    max-height: 450px;
+    margin-bottom: 10px;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+.list-group-item {
+    min-height: 50px;
 }
