@@ -3,7 +3,6 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import pandas as pd
 from collections import Counter
-from parameters import Parameters
 
 class Media(Enum):
     MOVIE = 'Movie'
@@ -78,39 +77,3 @@ class Recommender:
         else:
             print('Unknown media type: __remove_favorites_from_item_dfs')
             return
-
-def read_vectorized_items(in_file_name):
-    item_df = pd.read_csv('./' + in_file_name)
-    item_df.set_index('id', inplace=True)
-    item_df['vector'] = [np.fromstring(row['vector'], dtype=float, sep=' ') for i, row in item_df.iterrows()]
-    return item_df
-
-
-def main():
-    # Read item's data
-    movies_df = read_vectorized_items(Parameters.data_folder_path + Parameters.vectorized_movie_csv_name)
-    games_df = read_vectorized_items(Parameters.data_folder_path + Parameters.vectorized_game_csv_name)
-    books_df = read_vectorized_items(Parameters.data_folder_path + Parameters.vectorized_book_csv_name)
-    
-    # Read user favorites
-    user_favorites_df = pd.read_csv(Parameters.data_folder_path + Parameters.user_favorites_csv_name)
-
-    # Create a Recommender object
-    r = Recommender(movies_df, games_df, books_df, user_favorites_df)
-
-    # Generate recommendation
-    movie_recommendation = r.generate_k_recommendations(Media.MOVIE, 1)
-    print('Movies recommendation: ')
-    print(movie_recommendation)
-
-    game_recommendation = r.generate_k_recommendations(Media.GAME, 2)
-    print('\nGames recommendation: ')
-    print(game_recommendation)
-
-    book_recommendation = r.generate_k_recommendations(Media.BOOK, 5)
-    print('\nBooks recommendation: ')
-    print(book_recommendation)
-    
-
-if __name__ == '__main__':
-    main()

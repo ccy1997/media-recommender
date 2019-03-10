@@ -46,12 +46,43 @@ function search() {
     }
 }
 
+function submit_favorites() {
+    var favorites_str = favorites.toString();
+
+    var request = new XMLHttpRequest();
+        request.open('GET', '/submit?favorites=' + favorites_str);
+
+        request.onload = function() {
+            console.log('test');
+            var responseText = request.responseText;
+            var recommendation = JSON.parse(responseText).recommendation;
+
+            // For each recommendation title render a list item
+            for (i = 0; i < recommendation.length; i++) {
+                var title = recommendation[i].split('::')[0];
+                var type = recommendation[i].split('::')[1];
+                var li = document.createElement('li');
+                li.classList.add('list-group-item');
+                li.id = recommendation[i];
+                li.textContent = title + ' (' + type + ')';
+                document.getElementById('recommendation').appendChild(li);
+            }
+        }
+
+        request.send();
+}
+
 // Remove all buttons within search_results <div>
 function clearSearchResults() {
     var search_results = document.getElementById('search_results');
     while (search_results.firstChild) {
         search_results.removeChild(search_results.firstChild);
     }
+}
+
+function resetFavoritesAndRecommendation() {
+    resetFavorites();
+    resetRecommendationDisplay();
 }
 
 function resetFavorites() {
@@ -92,11 +123,19 @@ function update_favorites_display() {
     }
 }
 
-// Remove all buttons within favorites <div>
+// Remove all list item within favorites <div>
 function resetFavoritesDisplay() {
     var favorites = document.getElementById("favorites");
     while (favorites.firstChild) {
         favorites.removeChild(favorites.firstChild);
+    }
+}
+
+// Remove all list item within recommendation <div>
+function resetRecommendationDisplay() {
+    var recommendation = document.getElementById("recommendation");
+    while (recommendation.firstChild) {
+        recommendation.removeChild(recommendation.firstChild);
     }
 }
 
