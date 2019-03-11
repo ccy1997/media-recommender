@@ -35,18 +35,24 @@ def submit():
     game_recommendation_df = r.generate_k_recommendations(Media.GAME, 2)
     book_recommendation_df = r.generate_k_recommendations(Media.BOOK, 2)
 
-    user_recommendation_list = []
+    movie_recommendation_list = []
+    game_recommendation_list = []
+    book_recommendation_list = []
 
     for _, row in movie_recommendation_df.iteritems():
-        user_recommendation_list.append(row + '::' + 'Movie')
+        movie_recommendation_list.append(row)
 
     for _, row in game_recommendation_df.iteritems():
-        user_recommendation_list.append(row + '::' + 'Game')
+        game_recommendation_list.append(row)
 
     for _, row in book_recommendation_df.iteritems():
-        user_recommendation_list.append(row + '::' + 'Book')
+        book_recommendation_list.append(row)
     
-    return jsonify({'recommendation': user_recommendation_list})
+    return jsonify({
+        'movie': movie_recommendation_list,
+        'game': game_recommendation_list,
+        'book': book_recommendation_list
+    })
 
 def create_user_favorites_df(favorites):
     user_favorites_df = pd.DataFrame(columns=['item_id', 'type'])

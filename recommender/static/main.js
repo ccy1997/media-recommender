@@ -1,7 +1,7 @@
 favorites = [];
 
 function search() {
-    clearSearchResults();
+    removeAllChild('search_results');
     var query = document.getElementById("search").value.trim();
 
     // Process and send the query if it does not just consist of whitespaces
@@ -26,7 +26,7 @@ function search() {
 
                 // On mouse down listener for the button
                 button.onmousedown = function() {
-                    clearSearchResults();
+                    removeAllChild('search_results')
 
                     // Clear the search bar
                     document.getElementById('search').value = '';
@@ -47,52 +47,78 @@ function search() {
 }
 
 function submit_favorites() {
-    var favorites_str = favorites.toString();
+    if (favorites.length != 0) {
+        document.getElementById('alert_row').style.display = 'none';
+        var favorites_str = favorites.toString();
 
-    var request = new XMLHttpRequest();
-        request.open('GET', '/submit?favorites=' + favorites_str);
-
-        request.onload = function() {
-            console.log('test');
-            var responseText = request.responseText;
-            var recommendation = JSON.parse(responseText).recommendation;
-
-            // For each recommendation title render a list item
-            for (i = 0; i < recommendation.length; i++) {
-                var title = recommendation[i].split('::')[0];
-                var type = recommendation[i].split('::')[1];
-                var li = document.createElement('li');
-                li.classList.add('list-group-item');
-                li.id = recommendation[i];
-                li.textContent = title + ' (' + type + ')';
-                document.getElementById('recommendation').appendChild(li);
+        var request = new XMLHttpRequest();
+            request.open('GET', '/submit?favorites=' + favorites_str);
+    
+            request.onload = function() {
+                removeAllChild('movie_recommendation');
+                removeAllChild('game_recommendation');
+                removeAllChild('book_recommendation');
+                
+                var jsonResponse = JSON.parse(request.responseText);
+                var movie_recommendation = jsonResponse.movie;
+                var game_recommendation = jsonResponse.game;
+                var book_recommendation = jsonResponse.book;
+    
+                // For each movie recommendation title render a list item
+                for (i = 0; i < movie_recommendation.length; i++) {
+                    var title = movie_recommendation[i];
+                    var li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.id = title;
+                    li.textContent = title;
+                    document.getElementById('movie_recommendation').appendChild(li);
+                }
+    
+                // For each game recommendation title render a list item
+                for (i = 0; i < game_recommendation.length; i++) {
+                    var title = game_recommendation[i];
+                    var li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.id = title;
+                    li.textContent = title;
+                    document.getElementById('game_recommendation').appendChild(li);
+                }
+    
+                // For each book recommendation title render a list item
+                for (i = 0; i < book_recommendation.length; i++) {
+                    var title = book_recommendation[i];
+                    var li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.id = title;
+                    li.textContent = title;
+                    document.getElementById('book_recommendation').appendChild(li);
+                }
+    
             }
-        }
-
-        request.send();
-}
-
-// Remove all buttons within search_results <div>
-function clearSearchResults() {
-    var search_results = document.getElementById('search_results');
-    while (search_results.firstChild) {
-        search_results.removeChild(search_results.firstChild);
+    
+            request.send();
+    }
+    else {
+        document.getElementById('alert_row').style.display = 'block';
     }
 }
 
-function resetFavoritesAndRecommendation() {
-    resetFavorites();
-    resetRecommendationDisplay();
+function reset() {
+    removeFavorites();
+    removeAllChild('movie_recommendation');
+    removeAllChild('game_recommendation');
+    removeAllChild('book_recommendation');
+    document.getElementById('alert_row').style.display = 'none';
 }
 
-function resetFavorites() {
+function removeFavorites() {
     favorites = [];
     console.log(favorites);
-    resetFavoritesDisplay();
+    removeAllChild('favorites');
 }
 
 function update_favorites_display() {
-    resetFavoritesDisplay();
+    removeAllChild('favorites');
 
     for (i = 0; i < favorites.length; i++) {
         // Create a list item for the favorite item
@@ -123,19 +149,10 @@ function update_favorites_display() {
     }
 }
 
-// Remove all list item within favorites <div>
-function resetFavoritesDisplay() {
-    var favorites = document.getElementById("favorites");
-    while (favorites.firstChild) {
-        favorites.removeChild(favorites.firstChild);
-    }
-}
-
-// Remove all list item within recommendation <div>
-function resetRecommendationDisplay() {
-    var recommendation = document.getElementById("recommendation");
-    while (recommendation.firstChild) {
-        recommendation.removeChild(recommendation.firstChild);
+function removeAllChild(id) {
+    var element = document.getElementById(id);
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
     }
 }
 
