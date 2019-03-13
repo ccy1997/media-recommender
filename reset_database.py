@@ -26,7 +26,6 @@ for i, row in movie_df.iterrows():
         imdb_id=row['imdb_id'], 
         title=row['title'], 
         kind=row['kind'], 
-        votes=row['votes'], 
         vector=row['vector']
         )
     db.session.add(movie)
@@ -60,6 +59,6 @@ for i, row in book_df.iterrows():
 db.session.commit()
 
 # Test stuff
-print(Movie.query.all())
-print(Game.query.all())
-print(Book.query.first())
+# print(Movie.query.all())
+# print(Game.query.all())
+# print(Book.query.first())

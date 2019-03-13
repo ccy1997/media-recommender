@@ -24,6 +24,8 @@ def search():
 def submit():
     favorites_str = request.args.get('favorites')
     favorites = favorites_str.split(',')
+    print(favorites_str)
+    print(favorites)
     user_favorites_df = create_user_favorites_df(favorites)
     movies_df = movies_table_to_df()
     games_df = games_table_to_df()
@@ -77,10 +79,10 @@ def create_user_favorites_df(favorites):
     return user_favorites_df
 
 def movies_table_to_df():
-    movies_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'votes', 'vector'])
+    movies_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'vector'])
 
     for movie in Movie.query.all():
-        movies_df.loc[len(movies_df)] = [movie.id, movie.imdb_id, movie.title, movie.kind, movie.votes, movie.vector]
+        movies_df.loc[len(movies_df)] = [movie.id, movie.imdb_id, movie.title, movie.kind, movie.vector]
 
     movies_df.set_index('id', inplace=True)
     movies_df['vector'] = [np.fromstring(row['vector'], dtype=float, sep=' ') for i, row in movies_df.iterrows()]

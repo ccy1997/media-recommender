@@ -49,7 +49,7 @@ function search() {
 function submit_favorites() {
     if (favorites.length != 0) {
         document.getElementById('alert_row').style.display = 'none';
-        var favorites_str = favorites.toString();
+        var favorites_str = encodeURIComponent(favorites.toString());
 
         var request = new XMLHttpRequest();
             request.open('GET', '/submit?favorites=' + favorites_str);

@@ -44,5 +44,4 @@ def main():
                     Parameters.data_folder_path + Parameters.vectorized_book_csv_name, model)
 
 
-if __name__ == '__main__':
-    main()
+main()

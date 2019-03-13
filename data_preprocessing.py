@@ -60,10 +60,10 @@ def preprocess_item_documents(in_file_str, out_file_str):
     item_df = pd.read_csv('./' + in_file_str)
     item_df.set_index('id', inplace=True)
     item_remove_id = []
-    print('Preprocessing ' + in_file_str + '...')
     
     for i, row in item_df.iterrows():
-        item_df.at[i, 'title'] = remove_non_alphabet_and_useless_symbols(row['title'])
+        print('Preprocessing ' + in_file_str + ', item id = ' + str(i))
+        item_df.at[i, 'title'] = row['title'].replace(',', ' ')
         documents = row['documents'].split('::')
         keywords = ' '.join([preprocess_text(d) for d in documents])
         item_df.at[i, 'documents'] = keywords
@@ -85,5 +85,4 @@ def main():
                                 Parameters.data_folder_path + Parameters.preprocessed_book_csv_name)
 
 
-if __name__ == '__main__':
-    main()
+main()

@@ -5,7 +5,6 @@ class Movie(db.Model):
     imdb_id = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(), nullable=False)
     kind = db.Column(db.String(), nullable=False)
-    votes = db.Column(db.Integer, nullable=False)
     vector = db.Column(db.String(), nullable=False)
 
     def __repr__(self):
