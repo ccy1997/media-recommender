@@ -8,7 +8,11 @@ import xml.sax
 import requests
 import untangle
 import re
+import time
+import requests
+from lxml.html import fromstring
 from bs4 import BeautifulSoup
+from itertools import cycle
 from parameters import Parameters
 
 
@@ -59,10 +63,11 @@ def extract_games(start_offset, end_offset):
 def extract_books(start_id, end_id):
     goodreads_ids = range(start_id, end_id)
     book_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'isbn', 'isbn13', 'documents'])
+    # proxies = ['176.118.48.118:59905', '96.9.88.49:39566', '203.202.253.221:35243', '36.91.44.243:42524', '181.133.180.2:56943']
+    # proxy_pool = cycle(proxies)
 
     for goodreads_id in goodreads_ids:
         try:
-            print('Extracting books, id = ' + str(goodreads_id))
             url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_id) + '&format=xml&key=CoBtO9PVTZqNZ5tDLr9yGQ'
             parsed_xml = untangle.parse(url)
             title = parsed_xml.GoodreadsResponse.book.title.cdata
@@ -71,14 +76,14 @@ def extract_books(start_id, end_id):
             description = parsed_xml.GoodreadsResponse.book.description.cdata
             
             if title != '' and (isbn != '' or isbn13 != '') and description != '':
-                reviews = extract_book_reviews(goodreads_id)
-                document_list = [description] + reviews
-                book_df.loc[len(book_df)] = [len(book_df), goodreads_id, title, isbn, isbn13, '::'.join(document_list)]
+                # proxy = next(proxy_pool)
+                # reviews = extract_book_reviews(goodreads_id, proxy)
+                # document_list = [description]
+                print('Extracting books, id = ' + str(goodreads_id))
+                book_df.loc[len(book_df)] = [len(book_df), goodreads_id, title, isbn, isbn13, description]
                 
-        except urllib.error.HTTPError as e:
-            print(e)
-        except xml.sax.SAXParseException as e:
-            print(e)
+        except:
+            print('Untangle HTTP connection error')
 
     book_df.to_csv(Parameters.data_folder_path + Parameters.raw_book_csv_name, index=False, sep=',', encoding='utf-8')
 
@@ -86,8 +91,7 @@ def extract_books(start_id, end_id):
 def extract_movie_and_tv_reviews(id):
     url = 'https://www.imdb.com/title/tt' + id + '/reviews'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
-    request = urllib.request.Request(url, headers=headers)
-    html = urllib.request.urlopen(request).read()
+    html = requests.get(url, headers=headers).text
     soup = BeautifulSoup(html, 'html.parser')
     main = soup.find('div', attrs={'id': 'main'})
     review_divs = main.find_all('div', class_='text show-more__control')
@@ -97,8 +101,7 @@ def extract_movie_and_tv_reviews(id):
 
 def extract_game_reviews(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
-    request = urllib.request.Request(url, headers=headers)
-    html = urllib.request.urlopen(request).read()
+    html = requests.get(url, headers=headers).text
     soup = BeautifulSoup(html, 'html.parser')
     site_main = soup.find('div', attrs={'id': 'site-main'})
     review_title_divs = site_main.find_all('h3', class_='media-title')
@@ -114,32 +117,52 @@ def extract_game_reviews(url):
     return reviews
 
 
-def extract_book_reviews(id):
+def extract_book_reviews(id, proxy):
     url = 'https://www.goodreads.com/book/show/' + str(id)
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
-    request = urllib.request.Request(url, headers=headers)
-    html = urllib.request.urlopen(request).read()
-    soup = BeautifulSoup(html, 'html.parser')
-    book_reviews_div = soup.find('div', attrs={'id': 'bookReviews'})
-    review_containers = book_reviews_div.find_all('div', class_='friendReviews elementListBrown')
     review_texts = []
 
-    for rc in review_containers:
-        span = rc.find('span', id=re.compile(r'^freeText\d+'))
-        
-        if (span):                          # Long review
-            review_texts.append(span.text)
-        else:                               # Short review
-            span = rc.find('span', id=re.compile(r'^freeTextContainer\d+'))
-            review_texts.append(span.text)
+    while True:
+        try:
+            html = requests.get(url, headers=headers, proxies={"http": proxy, "https": proxy}).text
+            soup = BeautifulSoup(html, 'html.parser')
+            book_reviews_div = soup.find('div', attrs={'id': 'bookReviews'})
+            review_containers = book_reviews_div.find_all('div', class_='friendReviews elementListBrown')
+
+            for rc in review_containers:
+                span = rc.find('span', id=re.compile(r'^freeText\d+'))
+                
+                if (span):                          # Long review
+                    review_texts.append(span.text)
+                else:                               # Short review
+                    span = rc.find('span', id=re.compile(r'^freeTextContainer\d+'))
+                    review_texts.append(span.text)
+        except:
+            print('Retry (' + str(id) + ')')
+            continue
+        break
 
     return review_texts
 
 
+def get_proxies():
+    url = 'https://free-proxy-list.net/'
+    response = requests.get(url)
+    parser = fromstring(response.text)
+    proxies = set()
+    for i in parser.xpath('//tbody/tr')[:20]:
+        if i.xpath('.//td[7][contains(text(),"yes")]'):
+            #Grabbing IP and corresponding PORT
+            proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
+            proxies.add(proxy)
+    return proxies
+
+
 def main():
-    extract_movies_and_tv_shows(120000, 120200)
-    extract_games(0, 500)
-    extract_books(1, 50)
+    # extract_movies_and_tv_shows(120000, 121000)
+    # extract_games(0, 1000)
+    extract_books(1, 1000)
+    # print(get_proxies())
 
 
 main()

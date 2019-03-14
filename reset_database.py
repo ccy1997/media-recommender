@@ -38,6 +38,7 @@ for i, row in game_df.iterrows():
         id=i, 
         gamespot_id=row['gamespot_id'], 
         title=row['title'], 
+        url=row['url'], 
         vector=row['vector']
         )
     db.session.add(game)
