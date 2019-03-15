@@ -152,6 +152,14 @@ function createDeleteButton(id) {
     return delete_button;
 }
 
+// function createItemURLLink(url) {
+//     var a = document.createElement('a');
+//     a.id = id;
+//     a.href = url;
+//     a.textContent = 'Link';
+//     return a;
+// }
+
 function removeFavorites() {
     favorites = [];
     removeAllChild('movie_favorites');

@@ -1,4 +1,5 @@
 from imdb import IMDb, IMDbError
+import random
 import csv
 import json
 import urllib.request
@@ -16,11 +17,11 @@ from itertools import cycle
 from parameters import Parameters
 
 
-def extract_movies_and_tv_shows(start_id, end_id):
-    imdb_ids = range(start_id, end_id)
+def extract_movies_and_tv_shows(min_id, max_id, num_of_samples):
+    imdb_ids = random.sample(range(min_id, max_id), num_of_samples)
     prepended_imda_ids = [str(i).zfill(7) for i in imdb_ids]
     ia = IMDb()
-    movie_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'documents'])
+    movie_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'url', 'documents'])
     
     for imdb_id in prepended_imda_ids:
         try:
@@ -28,10 +29,11 @@ def extract_movies_and_tv_shows(start_id, end_id):
             movie = ia.get_movie(imdb_id, info=['main', 'synopsis', 'plot'])
             
             if 'title' in movie and 'kind' in movie and 'synopsis' in movie and 'plot' in movie:
+                url = 'https://www.imdb.com/title/tt' + imdb_id
                 reviews = extract_movie_and_tv_reviews(imdb_id)
                 summary_list = [summary.split('::')[0] for summary in movie['plot']]
                 document_list = movie['synopsis'] + summary_list + reviews
-                movie_df.loc[len(movie_df)] = [len(movie_df), imdb_id, movie['title'], movie['kind'], '::'.join(document_list)]
+                movie_df.loc[len(movie_df)] = [len(movie_df), imdb_id, movie['title'], movie['kind'], url, '::'.join(document_list)]
                 
         except IMDbError as e:
             print(e)
@@ -60,22 +62,21 @@ def extract_games(start_offset, end_offset):
     game_df.to_csv(Parameters.data_folder_path + Parameters.raw_game_csv_name, index=False, sep=',', encoding='utf-8')
 
 
-def extract_books(start_id, end_id):
-    goodreads_ids = range(start_id, end_id)
-    book_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'isbn', 'isbn13', 'documents'])
+def extract_books(min_id, max_id, num_of_samples):
+    goodreads_ids = random.sample(range(min_id, max_id), num_of_samples)
+    book_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'url', 'documents'])
 
     for goodreads_id in goodreads_ids:
         try:
             url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_id) + '&format=xml&key=CoBtO9PVTZqNZ5tDLr9yGQ'
+            detail_url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_id)
             parsed_xml = untangle.parse(url)
             title = parsed_xml.GoodreadsResponse.book.title.cdata
-            isbn = str(parsed_xml.GoodreadsResponse.book.isbn.cdata)
-            isbn13 = str(parsed_xml.GoodreadsResponse.book.isbn13.cdata)
             description = parsed_xml.GoodreadsResponse.book.description.cdata
             
-            if title != '' and (isbn != '' or isbn13 != '') and description != '':
+            if title != '' and description != '':
                 print('Extracting books, id = ' + str(goodreads_id))
-                book_df.loc[len(book_df)] = [len(book_df), goodreads_id, title, isbn, isbn13, description]
+                book_df.loc[len(book_df)] = [len(book_df), goodreads_id, title, detail_url, description]
                 
         except:
             print('Untangle HTTP connection error')
@@ -112,38 +113,38 @@ def extract_game_reviews(url):
     return reviews
 
 
-def extract_book_reviews(id, proxy):
-    url = 'https://www.goodreads.com/book/show/' + str(id)
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
-    review_texts = []
+# def extract_book_reviews(id, proxy):
+#     url = 'https://www.goodreads.com/book/show/' + str(id)
+#     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
+#     review_texts = []
 
-    while True:
-        try:
-            html = requests.get(url, headers=headers, proxies={"http": proxy, "https": proxy}).text
-            soup = BeautifulSoup(html, 'html.parser')
-            book_reviews_div = soup.find('div', attrs={'id': 'bookReviews'})
-            review_containers = book_reviews_div.find_all('div', class_='friendReviews elementListBrown')
+#     while True:
+#         try:
+#             html = requests.get(url, headers=headers, proxies={"http": proxy, "https": proxy}).text
+#             soup = BeautifulSoup(html, 'html.parser')
+#             book_reviews_div = soup.find('div', attrs={'id': 'bookReviews'})
+#             review_containers = book_reviews_div.find_all('div', class_='friendReviews elementListBrown')
 
-            for rc in review_containers:
-                span = rc.find('span', id=re.compile(r'^freeText\d+'))
+#             for rc in review_containers:
+#                 span = rc.find('span', id=re.compile(r'^freeText\d+'))
                 
-                if (span):                          # Long review
-                    review_texts.append(span.text)
-                else:                               # Short review
-                    span = rc.find('span', id=re.compile(r'^freeTextContainer\d+'))
-                    review_texts.append(span.text)
-        except:
-            print('Retry (' + str(id) + ')')
-            continue
-        break
+#                 if (span):                          # Long review
+#                     review_texts.append(span.text)
+#                 else:                               # Short review
+#                     span = rc.find('span', id=re.compile(r'^freeTextContainer\d+'))
+#                     review_texts.append(span.text)
+#         except:
+#             print('Retry (' + str(id) + ')')
+#             continue
+#         break
 
-    return review_texts
+#     return review_texts
 
 
 def main():
-    extract_movies_and_tv_shows(120000, 125000)
-    extract_games(0, 5000)
-    extract_books(1, 5000)
+    extract_movies_and_tv_shows(94000, 4200000, 200)
+    extract_games(10000, 10200)
+    extract_books(1, 1000000, 200)
 
 
 if __name__ == '__main__':

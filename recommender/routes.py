@@ -79,10 +79,10 @@ def create_user_favorites_df(favorites):
     return user_favorites_df
 
 def movies_table_to_df():
-    movies_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'vector'])
+    movies_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'url', 'vector'])
 
     for movie in Movie.query.all():
-        movies_df.loc[len(movies_df)] = [movie.id, movie.imdb_id, movie.title, movie.kind, movie.vector]
+        movies_df.loc[len(movies_df)] = [movie.id, movie.imdb_id, movie.title, movie.kind, movie.url, movie.vector]
 
     movies_df.set_index('id', inplace=True)
     movies_df['vector'] = [np.fromstring(row['vector'], dtype=float, sep=' ') for i, row in movies_df.iterrows()]
@@ -90,10 +90,10 @@ def movies_table_to_df():
     return movies_df
 
 def games_table_to_df():
-    games_df = pd.DataFrame(columns=['id', 'gamespot_id', 'title', 'vector'])
+    games_df = pd.DataFrame(columns=['id', 'gamespot_id', 'title', 'url', 'vector'])
 
     for game in Game.query.all():
-        games_df.loc[len(games_df)] = [game.id, game.gamespot_id, game.title, game.vector]
+        games_df.loc[len(games_df)] = [game.id, game.gamespot_id, game.title, game.url, game.vector]
 
     games_df.set_index('id', inplace=True)
     games_df['vector'] = [np.fromstring(row['vector'], dtype=float, sep=' ') for i, row in games_df.iterrows()]
@@ -101,10 +101,10 @@ def games_table_to_df():
     return games_df
 
 def books_table_to_df():
-    books_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'isbn', 'isbn13', 'vector'])
+    books_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'url', 'vector'])
 
     for book in Book.query.all():
-        books_df.loc[len(books_df)] = [book.id, book.goodreads_id, book.title, book.isbn, book.isbn13, book.vector]
+        books_df.loc[len(books_df)] = [book.id, book.goodreads_id, book.title, book.url, book.vector]
 
     books_df.set_index('id', inplace=True)
     books_df['vector'] = [np.fromstring(row['vector'], dtype=float, sep=' ') for i, row in books_df.iterrows()]

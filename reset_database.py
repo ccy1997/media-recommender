@@ -26,6 +26,7 @@ for i, row in movie_df.iterrows():
         imdb_id=row['imdb_id'], 
         title=row['title'], 
         kind=row['kind'], 
+        url=row['url'], 
         vector=row['vector']
         )
     db.session.add(movie)
@@ -51,8 +52,7 @@ for i, row in book_df.iterrows():
         id=i, 
         goodreads_id=row['goodreads_id'], 
         title=row['title'], 
-        isbn=row['isbn'],
-        isbn13=row['isbn13'], 
+        url=row['url'], 
         vector=row['vector']
         )
     db.session.add(book)
