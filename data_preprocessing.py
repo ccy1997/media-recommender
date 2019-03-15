@@ -84,5 +84,5 @@ def main():
     preprocess_item_documents(Parameters.data_folder_path + Parameters.raw_book_csv_name, 
                                 Parameters.data_folder_path + Parameters.preprocessed_book_csv_name)
 
-
-main()
+if __name__ == '__main__':
+    main()

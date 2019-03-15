@@ -11,13 +11,6 @@
         <div id="search_results" class="list-group"></div>
       </div>
     </div>
-    <div id="alert_row" class="row">
-      <div class="col-sm-12 text-center">
-        <div id="favorties_empty_alert" class="alert alert-primary" role="alert">
-          Input at least 1 favorite title.
-        </div>
-      </div>
-    </div>
     <div id="buttons_row" class="row">
       <div class="col-sm-6 text-center">
         <button type="button" class="btn btn-dark btn-block" onclick="submit_favorites()">Submit</button>
@@ -26,10 +19,23 @@
         <button type="button" class="btn btn-dark btn-block" onclick="reset()">Reset</button>
       </div>
     </div>
-    <div id="favorites_row" class="row">
-      <div class="col-sm-12 text-center">
+    <div id="favorites_header_row" class="row">
+      <div id="favorites_header" class="col-sm-12 text-center">
         <h4>Favorites</h4>
-        <div id="favorites" class="list-group"></div>
+      </div>
+    </div>
+    <div id="favorites_row" class="row">
+      <div class="col-sm-4 text-center">
+        <h5>Movie</h5>
+        <div id="movie_favorites"></div>
+      </div>
+      <div class="col-sm-4 text-center">
+        <h5>Game</h5>
+        <div id="game_favorites"></div>
+      </div>
+      <div class="col-sm-4 text-center">
+        <h5>Book</h5>
+        <div id="book_favorites"></div>
       </div>
     </div>
     <div id="recommendation_header_row" class="row">
@@ -40,15 +46,18 @@
     <div id="recommendation_row" class="row">
       <div class="col-sm-4 text-center">
         <h5>Movie</h5>
-        <div id="movie_recommendation" class="list-group"></div>
+        <div id="movie_recommendation"></div>
       </div>
       <div class="col-sm-4 text-center">
         <h5>Game</h5>
-        <div id="game_recommendation" class="list-group"></div>
+        <div id="recommendation_load_spinner" class="spinner-border m-5" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div id="game_recommendation"></div>
       </div>
       <div class="col-sm-4 text-center">
         <h5>Book</h5>
-        <div id="book_recommendation" class="list-group"></div>
+        <div id="book_recommendation"></div>
       </div>
     </div>
   </div>

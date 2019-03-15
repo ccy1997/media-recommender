@@ -24,17 +24,36 @@ input::-webkit-calendar-picker-indicator {
 
 #favorites_row {
     height: 300px;
-    margin-top: 25px;
     margin-bottom: 25px;
-    border-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
     padding: 10px;
     background-color: #E9ECEF
 }
 
-#favorites {
+#favorites_header_row {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding-top: 10px;
+    background-color: #E9ECEF
+}
+
+#movie_favorites {
+    height: 250px;
     max-height: 250px;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
+    overflow: auto;
+}
+
+#game_favorites {
+    height: 250px;
+    max-height: 250px;
+    overflow: auto;
+}
+
+#book_favorites {
+    height: 250px;
+    max-height: 250px;
+    overflow: auto;
 }
 
 #recommendation_header_row {
@@ -55,21 +74,21 @@ input::-webkit-calendar-picker-indicator {
 
 #movie_recommendation {
     max-height: 250px;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
+    overflow: auto;
 }
 
 #game_recommendation {
     max-height: 250px;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
+    overflow: auto;
+}
+
+.spinner-border {
+    display: none;
 }
 
 #book_recommendation {
     max-height: 250px;
-    margin-bottom: 10px;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
+    overflow: auto;
 }
 
 .list-group-item {

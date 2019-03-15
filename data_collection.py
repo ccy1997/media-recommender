@@ -63,8 +63,6 @@ def extract_games(start_offset, end_offset):
 def extract_books(start_id, end_id):
     goodreads_ids = range(start_id, end_id)
     book_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'isbn', 'isbn13', 'documents'])
-    # proxies = ['176.118.48.118:59905', '96.9.88.49:39566', '203.202.253.221:35243', '36.91.44.243:42524', '181.133.180.2:56943']
-    # proxy_pool = cycle(proxies)
 
     for goodreads_id in goodreads_ids:
         try:
@@ -76,9 +74,6 @@ def extract_books(start_id, end_id):
             description = parsed_xml.GoodreadsResponse.book.description.cdata
             
             if title != '' and (isbn != '' or isbn13 != '') and description != '':
-                # proxy = next(proxy_pool)
-                # reviews = extract_book_reviews(goodreads_id, proxy)
-                # document_list = [description]
                 print('Extracting books, id = ' + str(goodreads_id))
                 book_df.loc[len(book_df)] = [len(book_df), goodreads_id, title, isbn, isbn13, description]
                 
@@ -145,27 +140,14 @@ def extract_book_reviews(id, proxy):
     return review_texts
 
 
-def get_proxies():
-    url = 'https://free-proxy-list.net/'
-    response = requests.get(url)
-    parser = fromstring(response.text)
-    proxies = set()
-    for i in parser.xpath('//tbody/tr')[:20]:
-        if i.xpath('.//td[7][contains(text(),"yes")]'):
-            #Grabbing IP and corresponding PORT
-            proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
-            proxies.add(proxy)
-    return proxies
-
-
 def main():
-    # extract_movies_and_tv_shows(120000, 121000)
-    # extract_games(0, 1000)
-    extract_books(1, 1000)
-    # print(get_proxies())
+    extract_movies_and_tv_shows(120000, 125000)
+    extract_games(0, 5000)
+    extract_books(1, 5000)
 
 
-main()
+if __name__ == '__main__':
+    main()
 
 
 # For testing stuff
