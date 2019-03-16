@@ -62,7 +62,7 @@ def preprocess_item_documents(in_file_str, out_file_str):
     item_remove_id = []
     
     for i, row in item_df.iterrows():
-        print('Preprocessing ' + in_file_str + ', item id = ' + str(i))
+        print(f'Preprocessing {in_file_str}, item id = {str(i)}')
         item_df.at[i, 'title'] = row['title'].replace(',', ' ')
         documents = row['documents'].split('::')
         keywords = ' '.join([preprocess_text(d) for d in documents])

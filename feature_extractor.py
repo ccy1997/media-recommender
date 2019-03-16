@@ -24,7 +24,7 @@ def vectorize_items(in_file_str, out_file_str, model):
     item_df.set_index('id', inplace=True)
 
     for i, row in item_df.iterrows():
-        print( 'Vectorizing {}: id = {}'.format(in_file_str, str(i)) )
+        print(f'Vectorizing {in_file_str}: item_id = {str(i)}')
         word_list = row['words'].split(' ')
         item_df.at[i, 'words'] = np.array2string(calculate_item_vector(word_list, model.vector_size, model)).strip(' []')
 

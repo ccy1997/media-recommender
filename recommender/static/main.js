@@ -31,9 +31,9 @@ function submit_favorites() {
         // Display a load spinner
         document.getElementById("recommendation_load_spinner").style.display = 'inline-flex';
 
-        var favorites_str = encodeURIComponent(favorites.toString());
+        var favorites_json = createJSONObjectFromFavoritesArray(favorites)
         var request = new XMLHttpRequest();
-        request.open('GET', '/submit?favorites=' + favorites_str);
+        request.open('GET', '/submit?favorites=' + JSON.stringify(favorites_json));
     
         request.onload = function() {
             // Remove the load spinner
@@ -44,12 +44,12 @@ function submit_favorites() {
             var game_recommendation = jsonResponse.game;
             var book_recommendation = jsonResponse.book;
 
-            renderRecommendationFromArray(movie_recommendation, 'movie_recommendation');
-            renderRecommendationFromArray(game_recommendation, 'game_recommendation');
-            renderRecommendationFromArray(book_recommendation, 'book_recommendation');
+            renderRecommendation(movie_recommendation, 'movie_recommendation', '/static/imdb_icon.png');
+            renderRecommendation(game_recommendation, 'game_recommendation', '/static/gamespot_icon.png');
+            renderRecommendation(book_recommendation, 'book_recommendation', '/static/goodreads_icon.png');
         }
     
-            request.send();
+        request.send();
     }
 }
 
@@ -62,16 +62,18 @@ function reset() {
 
 function renderListGroupButtonsFromSearchResults(search_results) {
     for (i = 0; i < search_results.length; i++) {
-        var title = search_results[i].split('::')[0];
-        var type = search_results[i].split('::')[1];
+        var item_id = search_results[i].id;
+        var title = search_results[i].title;
+        var type = search_results[i].type;
         var button = document.createElement('button');
-        button.id = search_results[i];
+        button.id = item_id + '::' + title + '::' + type;
         button.classList.add('list-group-item');
         button.classList.add('list-group-item-action');
         button.textContent = title + ' (' + type + ')';  
         document.getElementById('search_results').appendChild(button);
 
         button.onmousedown = function() {
+            // Remove the drop-down list of search results
             removeAllChild('search_results')
 
             // Clear the search bar
@@ -96,8 +98,8 @@ function renderFavorites() {
 
     for (i = 0; i < favorites.length; i++) {
         // Create a list item for the favorite item
-        var title = favorites[i].split('::')[0];
-        var type = favorites[i].split('::')[1];
+        var title = favorites[i].split('::')[1];
+        var type = favorites[i].split('::')[2];
         var li = document.createElement('li');
         li.id = favorites[i];
         li.classList.add('list-group-item');
@@ -122,9 +124,10 @@ function renderFavorites() {
     }
 }
 
-function renderRecommendationFromArray(arr, list_group_id) {
+function renderRecommendation(arr, list_group_id, icon_path) {
     for (i = 0; i < arr.length; i++) {
-        var title = arr[i];
+        var title = arr[i].title;
+        var url = arr[i].url;
         var li = document.createElement('li');
         li.classList.add('list-group-item');
         li.classList.add('clearfix');
@@ -132,6 +135,10 @@ function renderRecommendationFromArray(arr, list_group_id) {
         li.textContent = title;
         li.style.borderRadius = '10px'
         document.getElementById(list_group_id).appendChild(li);
+
+        // Create and render a url link for the list item
+        var a = createItemURLLink(url, icon_path);
+        li.appendChild(a);
     }
 }
 
@@ -152,13 +159,19 @@ function createDeleteButton(id) {
     return delete_button;
 }
 
-// function createItemURLLink(url) {
-//     var a = document.createElement('a');
-//     a.id = id;
-//     a.href = url;
-//     a.textContent = 'Link';
-//     return a;
-// }
+function createItemURLLink(url, icon_path) {
+    var a = document.createElement('a');
+    a.classList.add('float-right');
+    a.href = url;
+    a.target = '_blank';
+
+    // Add an icon for the url link
+    var img = document.createElement('img');
+    img.src = icon_path;
+    a.appendChild(img);
+
+    return a;
+}
 
 function removeFavorites() {
     favorites = [];
@@ -172,6 +185,18 @@ function removeAllChild(id) {
     while (element.firstChild) {
         element.removeChild(element.firstChild);
     }
+}
+
+function createJSONObjectFromFavoritesArray(arr) {
+    arr_of_obj = []
+
+    for (i = 0; i < arr.length; i++) {
+        item_id = arr[i].split('::')[0];
+        type = arr[i].split('::')[2];
+        arr_of_obj.push({id: item_id, type: type});
+    }
+
+    return {favorites: arr_of_obj};
 }
 
 function arrayContains(arr, el) {

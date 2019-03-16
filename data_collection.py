@@ -23,9 +23,9 @@ def extract_movies_and_tv_shows(min_id, max_id, num_of_samples):
     ia = IMDb()
     movie_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'url', 'documents'])
     
-    for imdb_id in prepended_imda_ids:
+    for i, imdb_id in enumerate(prepended_imda_ids):
         try:
-            print('Extracting movies and tv shows, id = ' + imdb_id)
+            print(f'Extracting movies and tv shows, id = {imdb_id}, iter = {i}')
             movie = ia.get_movie(imdb_id, info=['main', 'synopsis', 'plot'])
             
             if 'title' in movie and 'kind' in movie and 'synopsis' in movie and 'plot' in movie:
@@ -52,9 +52,10 @@ def extract_games(start_offset, end_offset):
         response = requests.get(url, headers=headers)
         game_list = response.json()['results']
         
-        for game in game_list:
+        for i, game in enumerate(game_list):
+            print(f"Extracting games, id = {str(game['id'])}, iter = {i}")
+
             if game['id'] != '' and game['name'] != '' and game['description'] != '' and game['deck'] != '':
-                print('Extracting games, id = ' + str(game['id']))
                 reviews = extract_game_reviews(game['site_detail_url'] + 'reviews')
                 document_list = [game['description'], game['deck']] + reviews
                 game_df.loc[len(game_df)] = [len(game_df), game['id'], game['name'], game['site_detail_url'], '::'.join(document_list)]
@@ -66,8 +67,9 @@ def extract_books(min_id, max_id, num_of_samples):
     goodreads_ids = random.sample(range(min_id, max_id), num_of_samples)
     book_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'url', 'documents'])
 
-    for goodreads_id in goodreads_ids:
+    for i, goodreads_id in enumerate(goodreads_ids):
         try:
+            print(f'Extracting books, id = {str(goodreads_id)}, iter = {i}')
             url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_id) + '&format=xml&key=CoBtO9PVTZqNZ5tDLr9yGQ'
             detail_url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_id)
             parsed_xml = untangle.parse(url)
@@ -75,7 +77,6 @@ def extract_books(min_id, max_id, num_of_samples):
             description = parsed_xml.GoodreadsResponse.book.description.cdata
             
             if title != '' and description != '':
-                print('Extracting books, id = ' + str(goodreads_id))
                 book_df.loc[len(book_df)] = [len(book_df), goodreads_id, title, detail_url, description]
                 
         except:
@@ -142,9 +143,9 @@ def extract_game_reviews(url):
 
 
 def main():
-    extract_movies_and_tv_shows(94000, 4200000, 200)
-    extract_games(10000, 10200)
-    extract_books(1, 1000000, 200)
+    extract_movies_and_tv_shows(94000, 4200000, 5000)
+    extract_games(0, 5000)
+    extract_books(1, 1000000, 5000)
 
 
 if __name__ == '__main__':
