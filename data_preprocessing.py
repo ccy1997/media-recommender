@@ -77,12 +77,12 @@ def preprocess_item_documents(in_file_str, out_file_str):
 
 
 def main():
-    preprocess_item_documents(Parameters.data_folder_path + Parameters.raw_movie_csv_name,
-                                Parameters.data_folder_path + Parameters.preprocessed_movie_csv_name)
-    preprocess_item_documents(Parameters.data_folder_path + Parameters.raw_game_csv_name, 
-                                Parameters.data_folder_path + Parameters.preprocessed_game_csv_name)
-    preprocess_item_documents(Parameters.data_folder_path + Parameters.raw_book_csv_name, 
-                                Parameters.data_folder_path + Parameters.preprocessed_book_csv_name)
+    preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_movie_csv_name,
+                                Parameters.generated_data_path + Parameters.preprocessed_movie_csv_name)
+    preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_game_csv_name, 
+                                Parameters.generated_data_path + Parameters.preprocessed_game_csv_name)
+    preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_book_csv_name, 
+                                Parameters.generated_data_path + Parameters.preprocessed_book_csv_name)
 
 if __name__ == '__main__':
     main()

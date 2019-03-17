@@ -35,7 +35,7 @@ def vectorize_items(in_file_str, out_file_str, model):
 def prepare_word2vec_training_data():
     # Prepare movie description
     raw_movie_descriptions = []
-    with open('./data/movies_metadata.csv', encoding="utf-8") as movie_metadata_csv:
+    with open('./data/word2vec_train/movies_metadata.csv', encoding="utf-8") as movie_metadata_csv:
         csv_reader = csv.reader(movie_metadata_csv, delimiter=',')
         for i, row in enumerate(csv_reader):
             if i != 0:
@@ -44,7 +44,7 @@ def prepare_word2vec_training_data():
 
     # Prepare game description
     raw_game_descriptions = []
-    with open('./data/games_features.csv', encoding="utf-8") as game_features_csv:
+    with open('./data/word2vec_train/games_features.csv', encoding="utf-8") as game_features_csv:
         csv_reader = csv.reader(game_features_csv, delimiter=',')
         for i, row in enumerate(csv_reader):
             if i != 0:
@@ -53,7 +53,7 @@ def prepare_word2vec_training_data():
 
     # Prepare book description
     raw_book_descriptions = []
-    with open('./data/booksummaries.txt', encoding='utf-8') as book_summaries_csv:
+    with open('./data/word2vec_train/booksummaries.txt', encoding='utf-8') as book_summaries_csv:
         csv_reader = csv.reader(book_summaries_csv, delimiter='\t')
         for i, row in enumerate(csv_reader):
             if i != 0:
@@ -72,12 +72,12 @@ def main():
     print('Model trained')
 
     # Vectorize items by corresponding keywords
-    vectorize_items(Parameters.data_folder_path + Parameters.preprocessed_movie_csv_name, 
-                    Parameters.data_folder_path + Parameters.vectorized_movie_csv_name, model)
-    vectorize_items(Parameters.data_folder_path + Parameters.preprocessed_game_csv_name, 
-                    Parameters.data_folder_path + Parameters.vectorized_game_csv_name, model)
-    vectorize_items(Parameters.data_folder_path + Parameters.preprocessed_book_csv_name, 
-                    Parameters.data_folder_path + Parameters.vectorized_book_csv_name, model)
+    vectorize_items(Parameters.generated_data_path + Parameters.preprocessed_movie_csv_name, 
+                    Parameters.generated_data_path + Parameters.vectorized_movie_csv_name, model)
+    vectorize_items(Parameters.generated_data_path + Parameters.preprocessed_game_csv_name, 
+                    Parameters.generated_data_path + Parameters.vectorized_game_csv_name, model)
+    vectorize_items(Parameters.generated_data_path + Parameters.preprocessed_book_csv_name, 
+                    Parameters.generated_data_path + Parameters.vectorized_book_csv_name, model)
 
 
 if __name__ == '__main__':

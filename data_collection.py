@@ -11,82 +11,113 @@ import untangle
 import re
 import time
 import requests
+import itertools
 from lxml.html import fromstring
 from bs4 import BeautifulSoup
 from itertools import cycle
 from parameters import Parameters
 
 
-def extract_movies_and_tv_shows(min_id, max_id, num_of_samples):
-    imdb_ids = random.sample(range(min_id, max_id), num_of_samples)
-    prepended_imda_ids = [str(i).zfill(7) for i in imdb_ids]
+def extract_movies(num_of_samples):
+    movies_titles = read_sample_movies_titles()[0:num_of_samples]
     ia = IMDb()
     movie_df = pd.DataFrame(columns=['id', 'imdb_id', 'title', 'kind', 'url', 'documents'])
     
-    for i, imdb_id in enumerate(prepended_imda_ids):
+    for i, title in movies_titles.iteritems():
         try:
-            print(f'Extracting movies and tv shows, id = {imdb_id}, iter = {i}')
-            movie = ia.get_movie(imdb_id, info=['main', 'synopsis', 'plot'])
-            
-            if 'title' in movie and 'kind' in movie and 'synopsis' in movie and 'plot' in movie:
-                url = 'https://www.imdb.com/title/tt' + imdb_id
-                reviews = extract_movie_and_tv_reviews(imdb_id)
-                summary_list = [summary.split('::')[0] for summary in movie['plot']]
-                document_list = movie['synopsis'] + summary_list + reviews
-                movie_df.loc[len(movie_df)] = [len(movie_df), imdb_id, movie['title'], movie['kind'], url, '::'.join(document_list)]
+            print(f'Extracting movies and tv shows, title = {title}, iter = {i}')
+            search_results = ia.search_movie(title)
+
+            if search_results:
+                movie = search_results[0]
+                ia.update(movie, info=['main', 'synopsis', 'plot'])
+                
+                if 'title' in movie and 'kind' in movie and 'synopsis' in movie and 'plot' in movie:
+                    url = f'https://www.imdb.com/title/tt{movie.movieID}'
+                    reviews = scrap_movie_reviews(movie.movieID)
+                    summary_list = [summary.split('::')[0] for summary in movie['plot']]
+                    document_list = movie['synopsis'] + summary_list + reviews
+                    movie_df.loc[len(movie_df)] = [len(movie_df), movie.movieID, movie['title'], movie['kind'], url, '::'.join(document_list)]
+            else:
+                print('Imdb search fail')
                 
         except IMDbError as e:
             print(e)
         except urllib.error.HTTPError as e:
             print(e)
 
-    movie_df.to_csv(Parameters.data_folder_path + Parameters.raw_movie_csv_name, index=False, sep=',', encoding='utf-8')  
+    movie_df.to_csv(Parameters.generated_data_path + Parameters.raw_movie_csv_name, index=False, sep=',', encoding='utf-8')  
 
 
-def extract_games(start_offset, end_offset):
-    game_df = pd.DataFrame(columns=['id', 'gamespot_id', 'title', 'url', 'documents'])
+def extract_games(num_of_samples):
+    games_titles = read_sample_games_titles()[0:num_of_samples]
+    game_df = pd.DataFrame(columns=['id', 'giantbomb_id', 'title', 'url', 'documents'])
     
-    for i in range(start_offset, end_offset, 100):
+    for i, title in enumerate(games_titles):
+        print(f"Extracting games, title = {title}, iter = {i}")
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
-        url = 'https://www.gamespot.com/api/games/?api_key=8478350e6908059abd12fd068ef96925f6bfc1c3&offset=' + str(i) + '&field_list=id,name,site_detail_url,deck,description&sort=id:asc&format=json'
+        api_key = '4b306930406dea7cece3c835916b9c9ac17c1082'
+
+        # Search the game by the title text
+        url = f'https://www.giantbomb.com/api/search/?api_key={api_key}&format=json&query={title}&field_list=id&resources=game'
         response = requests.get(url, headers=headers)
-        game_list = response.json()['results']
+        giantbomb_game_id = response.json()['results'][0]['id']
+
+        # Request info of the game by giantbomb id
+        url = f'https://www.giantbomb.com/api/game/{giantbomb_game_id}/?api_key={api_key}&format=json&field_list=site_detail_url,deck,description,reviews'
+        response = requests.get(url, headers=headers)
+        results = response.json()['results']
+        game_deck = ''
+        game_description = ''
+        review_deck = ''
+        review_description = ''
+
+        if results['deck']:
+            game_deck = results['deck']
+
+        if results['description']:
+            game_description = results['description']
         
-        for i, game in enumerate(game_list):
-            print(f"Extracting games, id = {str(game['id'])}, iter = {i}")
+        site_detail_url = results['site_detail_url']
 
-            if game['id'] != '' and game['name'] != '' and game['description'] != '' and game['deck'] != '':
-                reviews = extract_game_reviews(game['site_detail_url'] + 'reviews')
-                document_list = [game['description'], game['deck']] + reviews
-                game_df.loc[len(game_df)] = [len(game_df), game['id'], game['name'], game['site_detail_url'], '::'.join(document_list)]
+        # Request first staff review of the game (if any)
+        if 'reviews' in results:
+            url = results['reviews'][0]['api_detail_url']
+            response = requests.get(f'{url}?api_key={api_key}&format=json&field_list=deck,description', headers=headers)
+            results = response.json()['results']
+            review_deck = results['deck']
+            review_description = results['description']
+        
+        document = f'{game_deck}::{game_description}::{review_deck}::{review_description}'
+        game_df.loc[len(game_df)] = [len(game_df), giantbomb_game_id, title, site_detail_url, document]
 
-    game_df.to_csv(Parameters.data_folder_path + Parameters.raw_game_csv_name, index=False, sep=',', encoding='utf-8')
+    game_df.to_csv(Parameters.generated_data_path + Parameters.raw_game_csv_name, index=False, sep=',', encoding='utf-8')
 
 
-def extract_books(min_id, max_id, num_of_samples):
-    goodreads_ids = random.sample(range(min_id, max_id), num_of_samples)
+def extract_books(num_of_samples):
+    goodreads_books_ids = read_sample_books_goodreads_ids()[0:num_of_samples]
     book_df = pd.DataFrame(columns=['id', 'goodreads_id', 'title', 'url', 'documents'])
 
-    for i, goodreads_id in enumerate(goodreads_ids):
+    for i, goodreads_book_id in goodreads_books_ids.iteritems():
         try:
-            print(f'Extracting books, id = {str(goodreads_id)}, iter = {i}')
-            url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_id) + '&format=xml&key=CoBtO9PVTZqNZ5tDLr9yGQ'
-            detail_url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_id)
+            print(f'Extracting books, id = {str(goodreads_book_id)}, iter = {i}')
+            url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_book_id) + '&format=xml&key=CoBtO9PVTZqNZ5tDLr9yGQ'
+            detail_url = 'https://www.goodreads.com/book/show/?id=' + str(goodreads_book_id)
             parsed_xml = untangle.parse(url)
             title = parsed_xml.GoodreadsResponse.book.title.cdata
             description = parsed_xml.GoodreadsResponse.book.description.cdata
             
             if title != '' and description != '':
-                book_df.loc[len(book_df)] = [len(book_df), goodreads_id, title, detail_url, description]
+                book_df.loc[len(book_df)] = [len(book_df), goodreads_book_id, title, detail_url, description]
                 
         except:
             print('Untangle HTTP connection error')
 
-    book_df.to_csv(Parameters.data_folder_path + Parameters.raw_book_csv_name, index=False, sep=',', encoding='utf-8')
+    book_df.to_csv(Parameters.generated_data_path + Parameters.raw_book_csv_name, index=False, sep=',', encoding='utf-8')
 
 
-def extract_movie_and_tv_reviews(id):
-    url = 'https://www.imdb.com/title/tt' + id + '/reviews'
+def scrap_movie_reviews(id):
+    url = f'https://www.imdb.com/title/tt{id}/reviews'
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
     html = requests.get(url, headers=headers).text
     soup = BeautifulSoup(html, 'html.parser')
@@ -96,56 +127,27 @@ def extract_movie_and_tv_reviews(id):
     return reviews
 
 
-def extract_game_reviews(url):
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
-    html = requests.get(url, headers=headers).text
-    soup = BeautifulSoup(html, 'html.parser')
-    site_main = soup.find('div', attrs={'id': 'site-main'})
-    review_title_divs = site_main.find_all('h3', class_='media-title')
-    review_content_divs = site_main.find_all('p', class_='userReview-list__deck')
-    reviews = []
-
-    for rtd in review_title_divs:
-        reviews.append(rtd.text)
-
-    for rcd in review_content_divs:
-        reviews.append(rcd.text.strip('Read Full Review'))
-
-    return reviews
+def read_sample_movies_titles():
+    movies_df = pd.read_csv(f'{Parameters.item_source_data_path}movies.dat', sep='::', encoding='utf-8', engine='python')
+    movies_df.set_index('MovieID', inplace=True)
+    return movies_df['Title']
 
 
-# def extract_book_reviews(id, proxy):
-#     url = 'https://www.goodreads.com/book/show/' + str(id)
-#     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'}
-#     review_texts = []
+def read_sample_games_titles():
+    games_df = pd.read_csv(f'{Parameters.item_source_data_path}steam-200k.csv', encoding='utf-8')
+    return [key for key, _ in itertools.groupby(games_df['title'])]
 
-#     while True:
-#         try:
-#             html = requests.get(url, headers=headers, proxies={"http": proxy, "https": proxy}).text
-#             soup = BeautifulSoup(html, 'html.parser')
-#             book_reviews_div = soup.find('div', attrs={'id': 'bookReviews'})
-#             review_containers = book_reviews_div.find_all('div', class_='friendReviews elementListBrown')
 
-#             for rc in review_containers:
-#                 span = rc.find('span', id=re.compile(r'^freeText\d+'))
-                
-#                 if (span):                          # Long review
-#                     review_texts.append(span.text)
-#                 else:                               # Short review
-#                     span = rc.find('span', id=re.compile(r'^freeTextContainer\d+'))
-#                     review_texts.append(span.text)
-#         except:
-#             print('Retry (' + str(id) + ')')
-#             continue
-#         break
-
-#     return review_texts
+def read_sample_books_goodreads_ids():
+    books_df = pd.read_csv(f'{Parameters.item_source_data_path}books.csv', encoding='utf-8')
+    books_df.set_index('id', inplace=True)
+    return books_df['book_id']
 
 
 def main():
-    extract_movies_and_tv_shows(94000, 4200000, 5000)
-    extract_games(0, 5000)
-    extract_books(1, 1000000, 5000)
+    extract_movies(100)
+    extract_games(100)
+    extract_books(100)
 
 
 if __name__ == '__main__':
@@ -156,6 +158,7 @@ if __name__ == '__main__':
 
 # ia = IMDb()
 # print(ia.get_movie_infoset())
+# print(ia.search_movie('Shanghai Triad (Yao a yao yao dao waipo qiao) (1995)'))
 # ex1 = ia.get_movie('0120004', info=['main', 'synopsis', 'plot', 'vote details', 'reviews'])
 # ex2 = ia.get_movie('0133093', info=['main', 'synopsis', 'plot'])
 # print(ex1['synopsis'])

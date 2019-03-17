@@ -11,4 +11,6 @@ class Parameters:
     vectorized_game_csv_name = 'vectorized_games.csv'
     vectorized_book_csv_name = 'vectorized_books.csv'
     user_favorites_csv_name = 'user_favorites.csv'
-    data_folder_path = './data/'
+    generated_data_path = './data/generated/'
+    item_source_data_path = './data/item_source/'
+    

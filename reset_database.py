@@ -12,11 +12,11 @@ db.drop_all()
 db.create_all()
 
 # Read items in DataFrame
-movie_df = pd.read_csv(Parameters.data_folder_path + Parameters.vectorized_movie_csv_name)
+movie_df = pd.read_csv(Parameters.generated_data_path + Parameters.vectorized_movie_csv_name)
 movie_df.set_index('id', inplace=True)
-game_df = pd.read_csv(Parameters.data_folder_path + Parameters.vectorized_game_csv_name)
+game_df = pd.read_csv(Parameters.generated_data_path + Parameters.vectorized_game_csv_name)
 game_df.set_index('id', inplace=True)
-book_df = pd.read_csv(Parameters.data_folder_path + Parameters.vectorized_book_csv_name)
+book_df = pd.read_csv(Parameters.generated_data_path + Parameters.vectorized_book_csv_name)
 book_df.set_index('id', inplace=True)
 
 # Populate movie table
@@ -37,7 +37,7 @@ db.session.commit()
 for i, row in game_df.iterrows():
     game = Game(
         id=i, 
-        gamespot_id=row['gamespot_id'], 
+        giantbomb_id=row['giantbomb_id'], 
         title=row['title'], 
         url=row['url'], 
         vector=row['vector']

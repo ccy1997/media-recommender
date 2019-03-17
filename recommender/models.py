@@ -13,7 +13,7 @@ class Movie(db.Model):
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    gamespot_id = db.Column(db.Integer, nullable=False)
+    giantbomb_id = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(), nullable=False)
     url = db.Column(db.String(), nullable=False)
     vector = db.Column(db.String(), nullable=False)
