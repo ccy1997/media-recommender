@@ -20,15 +20,15 @@ class Recommender:
 
         if media_type == Media.MOVIE:
             favorite_movies_id = self.__get_favorites_id('Movie')
-            all_items_without_favorites = Movie.query.filter(Movie.id not in favorite_movies_id).all()
+            all_items_without_favorites = Movie.query.filter(~Movie.id.in_(favorite_movies_id)).all()
             item_vectors = np.vstack([np.fromstring(movie.vector, dtype=int, sep=' ') for movie in all_items_without_favorites])
         elif media_type == Media.GAME:
             favorite_games_id = self.__get_favorites_id('Game')
-            all_items_without_favorites = Game.query.filter(Game.id not in favorite_games_id).all()
+            all_items_without_favorites = Game.query.filter(~Game.id.in_(favorite_games_id)).all()
             item_vectors = np.vstack([np.fromstring(game.vector, dtype=int, sep=' ') for game in all_items_without_favorites])
         elif media_type == Media.BOOK:
             favorite_books_id = self.__get_favorites_id('Book')
-            all_items_without_favorites = Book.query.filter(Book.id not in favorite_books_id).all()
+            all_items_without_favorites = Book.query.filter(~Book.id.in_(favorite_books_id)).all()
             item_vectors = np.vstack([np.fromstring(book.vector, dtype=int, sep=' ') for book in all_items_without_favorites])
         else:
             print('Unknown media type: generate_k_recommendations')

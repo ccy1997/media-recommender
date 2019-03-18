@@ -13,4 +13,6 @@ class Parameters:
     user_favorites_csv_name = 'user_favorites.csv'
     generated_data_path = './data/generated/'
     item_source_data_path = './data/item_source/'
+    word2vec_train_data_path = './data/word2vec_train/'
+    empty_results_retry_limit = 10
     

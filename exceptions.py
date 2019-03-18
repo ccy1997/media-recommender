@@ -1,0 +1,2 @@
+class EmptyResults(Exception):
+   pass
