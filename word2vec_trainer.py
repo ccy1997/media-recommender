@@ -93,9 +93,9 @@ def save_model_vectors(model):
 
 
 def main():
-    # training_documents = prepare_word2vec_training_data()
-    # model = word2vec_train(training_documents)
-    # save_model_vectors(model)
+    training_documents = prepare_word2vec_training_data()
+    model = word2vec_train(training_documents)
+    save_model_vectors(model)
 
 
 if __name__ == '__main__':

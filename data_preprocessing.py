@@ -63,24 +63,28 @@ def preprocess_item_documents(in_file_str, out_file_str):
     
     for i, row in item_df.iterrows():
         print(f'Preprocessing {in_file_str}, item id = {str(i)}')
-        item_df.at[i, 'title'] = row['title'].replace(',', ' ')
-        documents = row['documents'].split('::')
-        keywords = ' '.join([preprocess_text(d) for d in documents])
-        item_df.at[i, 'documents'] = keywords
+        if pd.isnull(item_df.at[i, 'documents']):
+            item_remove_id.append(i)
+        else:
+            item_df.at[i, 'title'] = row['title'].replace(',', ' ')
+            documents = row['documents'].split('::')
+            keywords = ' '.join([preprocess_text(d) for d in documents])
+            if keywords != '':
+                item_df.at[i, 'documents'] = keywords
+            else:
+                item_remove_id.append(i)
 
-        if item_df.at[i, 'title'] == '' or item_df.at[i, 'documents'] == '':
-            item_remove_id.append(item_df.index[i])
-
+    print(item_remove_id)
     item_df.drop(item_remove_id, inplace=True)
     item_df.rename(columns = {'documents':'words'}, inplace=True)
     item_df.to_csv(out_file_str, sep=',', encoding='utf-8')
 
 
 def main():
-    preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_movie_csv_name,
-                                Parameters.generated_data_path + Parameters.preprocessed_movie_csv_name)
-    preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_game_csv_name, 
-                                Parameters.generated_data_path + Parameters.preprocessed_game_csv_name)
+    # preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_movie_csv_name,
+    #                             Parameters.generated_data_path + Parameters.preprocessed_movie_csv_name)
+    # preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_game_csv_name, 
+    #                             Parameters.generated_data_path + Parameters.preprocessed_game_csv_name)
     preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_book_csv_name, 
                                 Parameters.generated_data_path + Parameters.preprocessed_book_csv_name)
 
