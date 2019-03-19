@@ -2,7 +2,9 @@ import nltk
 import pandas as pd
 import re
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
+from unidecode import unidecode
 from parameters import Parameters
 
 
@@ -38,6 +40,10 @@ def remove_html_tags(text):
     return soup.get_text()
 
 
+def replace_accents(text):
+    return unidecode(text)
+
+
 def replace_simple_apostrophe(text):
     return re.sub(r'’+', '\'', text)
 
@@ -46,14 +52,36 @@ def remove_non_alphabet_and_useless_symbols(text):
     return re.sub(r'[^a-zA-Z-\'’]+', ' ', text)
 
 
+def remove_stop_words(word_list):
+    filtered_word_list = []
+    stop_words = set(stopwords.words('english'))
+    for w in word_list:
+        if w not in stop_words:
+            filtered_word_list.append(w)
+    return filtered_word_list
+
+
 def preprocess_text(text):
     text_no_html_tags = remove_html_tags(text)
     text_simple_apostrophe = replace_simple_apostrophe(text_no_html_tags)
-    text_alphabets_dash_apostrophe = remove_non_alphabet_and_useless_symbols(text_simple_apostrophe)
-    tokenized_text = nltk.word_tokenize(text_alphabets_dash_apostrophe)
+    text_accents_replaced = replace_accents(text_simple_apostrophe)
+    text_alphabets_dash_apostrophe = remove_non_alphabet_and_useless_symbols(text_accents_replaced)
+    text_accents_replaced = replace_accents(text_alphabets_dash_apostrophe)
+    tokenized_text = nltk.word_tokenize(text_accents_replaced)
     nouns_and_adjs = extract_nouns_and_adjs(tokenized_text)
     lemmatized_text = lemmatize_words(nouns_and_adjs)
     return ' '.join(lemmatized_text)
+
+def preprocess_text_for_word2vec(text):
+    text_no_html_tags = remove_html_tags(text)
+    text_simple_apostrophe = replace_simple_apostrophe(text_no_html_tags)
+    text_accents_replaced = replace_accents(text_simple_apostrophe)
+    text_alphabets_dash_apostrophe = remove_non_alphabet_and_useless_symbols(text_accents_replaced)
+    text_accents_replaced = replace_accents(text_alphabets_dash_apostrophe)
+    tokenized_text = nltk.word_tokenize(text_accents_replaced)
+    text_no_stop_words = remove_stop_words(tokenized_text)
+    lemmatized_text = lemmatize_words(text_no_stop_words)
+    return lemmatized_text
 
 
 def preprocess_item_documents(in_file_str, out_file_str):
@@ -81,10 +109,10 @@ def preprocess_item_documents(in_file_str, out_file_str):
 
 
 def main():
-    # preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_movie_csv_name,
-    #                             Parameters.generated_data_path + Parameters.preprocessed_movie_csv_name)
-    # preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_game_csv_name, 
-    #                             Parameters.generated_data_path + Parameters.preprocessed_game_csv_name)
+    preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_movie_csv_name,
+                                Parameters.generated_data_path + Parameters.preprocessed_movie_csv_name)
+    preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_game_csv_name, 
+                                Parameters.generated_data_path + Parameters.preprocessed_game_csv_name)
     preprocess_item_documents(Parameters.generated_data_path + Parameters.raw_book_csv_name, 
                                 Parameters.generated_data_path + Parameters.preprocessed_book_csv_name)
 

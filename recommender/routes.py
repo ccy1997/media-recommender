@@ -28,9 +28,9 @@ def submit():
     r = Recommender(favorites_dict)
 
     # Generate recommendation
-    movie_recommendation = r.generate_k_recommendations(Media.MOVIE, 2)
-    game_recommendation = r.generate_k_recommendations(Media.GAME, 2)
-    book_recommendation = r.generate_k_recommendations(Media.BOOK, 2)
+    movie_recommendation = r.generate_k_recommendations(Media.MOVIE, 5)
+    game_recommendation = r.generate_k_recommendations(Media.GAME, 5)
+    book_recommendation = r.generate_k_recommendations(Media.BOOK, 5)
     
     return jsonify({
         'movie': movie_recommendation,
