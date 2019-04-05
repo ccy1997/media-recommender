@@ -85,36 +85,11 @@ def read_book_documents():
                 processed_book_documents += processed_documents
     return processed_book_documents
 
-# def read_movie_reviews():
-#     print('Reading movie reviews...')
-#     raw_movie_reviews = []
-#     file_names = listdir(f'{Parameters.word2vec_train_data_path}unsup')
-#     for fn in file_names:
-#         with open(f'{Parameters.word2vec_train_data_path}unsup/{fn}', mode='r', encoding='utf-8') as review_file:
-#             review_text = review_file.readline()
-#             raw_movie_reviews.append(review_text)
-#     print('Processing movie reviews...')
-#     processed_movie_reviews = []
-#     for rmr in raw_movie_reviews:
-#         mr_no_html_tags = remove_html_tags(rmr)
-#         mr_tokenized = simple_preprocess(mr_no_html_tags)
-#         mr_lemmatized = lemmatize_words(mr_tokenized)
-#         processed_movie_reviews.append(mr_lemmatized)
-#     return processed_movie_reviews
-    
-
-# def read_game_reviews():
-#     print('Reading game reviews...')
-#     raw_game_reviews = []
-#     processed_game_reviews = []
-#     print('Processing game reviews...')
-#     return processed_game_reviews
-
 
 def word2vec_train(training_documents):
     print(len(training_documents))
     print('Training model...')
-    model = Word2Vec(training_documents, min_count=2, workers=4)
+    model = Word2Vec(training_documents, size=50, min_count=2, workers=4)
     model.train(training_documents, total_examples=len(training_documents), epochs=10)
     print('Model trained')
     return model

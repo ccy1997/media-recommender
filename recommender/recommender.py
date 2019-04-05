@@ -21,21 +21,23 @@ class Recommender:
         if media_type == Media.MOVIE:
             favorite_movies_id = self.__get_favorites_id('Movie')
             all_items_without_favorites = Movie.query.filter(~Movie.id.in_(favorite_movies_id)).all()
-            item_vectors = np.vstack([np.fromstring(movie.vector, dtype=int, sep=' ') for movie in all_items_without_favorites])
+            item_vectors = np.vstack([np.fromstring(movie.vector, dtype=float, sep=' ') for movie in all_items_without_favorites])
         elif media_type == Media.GAME:
             favorite_games_id = self.__get_favorites_id('Game')
             all_items_without_favorites = Game.query.filter(~Game.id.in_(favorite_games_id)).all()
-            item_vectors = np.vstack([np.fromstring(game.vector, dtype=int, sep=' ') for game in all_items_without_favorites])
+            item_vectors = np.vstack([np.fromstring(game.vector, dtype=float, sep=' ') for game in all_items_without_favorites])
         elif media_type == Media.BOOK:
             favorite_books_id = self.__get_favorites_id('Book')
             all_items_without_favorites = Book.query.filter(~Book.id.in_(favorite_books_id)).all()
-            item_vectors = np.vstack([np.fromstring(book.vector, dtype=int, sep=' ') for book in all_items_without_favorites])
+            item_vectors = np.vstack([np.fromstring(book.vector, dtype=float, sep=' ') for book in all_items_without_favorites])
         else:
             print('Unknown media type: generate_k_recommendations')
             return
 
-        nbrs = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(item_vectors)
-        _, indices = nbrs.kneighbors(self.user_vector)
+        nbrs = NearestNeighbors(n_neighbors=k, algorithm='brute').fit(item_vectors)
+        distances, indices = nbrs.kneighbors(self.user_vector)
+
+        print(distances)
         
         recommended_movies = []
 
@@ -57,13 +59,13 @@ class Recommender:
             
             if Media(media_type) == Media.MOVIE:
                 movie = Movie.query.filter(Movie.id == item_id).first()
-                favorite_vectors.append(np.fromstring(movie.vector, dtype=int, sep=' '))
+                favorite_vectors.append(np.fromstring(movie.vector, dtype=float, sep=' '))
             elif Media(media_type) == Media.GAME:
                 game = Game.query.filter(Game.id == item_id).first()
-                favorite_vectors.append(np.fromstring(game.vector, dtype=int, sep=' '))
+                favorite_vectors.append(np.fromstring(game.vector, dtype=float, sep=' '))
             elif Media(media_type) == Media.BOOK:
                 book = Book.query.filter(Book.id == item_id).first()
-                favorite_vectors.append(np.fromstring(book.vector, dtype=int, sep=' '))
+                favorite_vectors.append(np.fromstring(book.vector, dtype=float, sep=' '))
             else:
                 print('Unknown media type: __user_favorites_to_user_vector')
                 return
