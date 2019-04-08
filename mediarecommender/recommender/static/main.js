@@ -46,7 +46,7 @@ function submit_favorites() {
             var book_recommendation = jsonResponse.book;
 
             renderRecommendation(movie_recommendation, 'movie_recommendation', '/static/imdb_icon.png');
-            renderRecommendation(game_recommendation, 'game_recommendation', '/static/giantbomb_icon.png');
+            renderRecommendation(game_recommendation, 'game_recommendation', '/static/steam_icon.png');
             renderRecommendation(book_recommendation, 'book_recommendation', '/static/goodreads_icon.png');
         }
     

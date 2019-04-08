@@ -16,4 +16,4 @@ mr.run()
 ```
 **IMPORTANT: Put the above code in a .py file and run it, DO NOT run them directly in Python interactive shell**
 ## Launch the web application
-Click the url prompted after running the server
+Open the url prompted after running the server

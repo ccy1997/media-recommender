@@ -2,3 +2,7 @@ __pycache__
 .vscode
 GoogleNews-vectors-negative300.bin
 unsup/
+build/
+dist/
+media_recommender.egg-info
+MANIFEST.in
