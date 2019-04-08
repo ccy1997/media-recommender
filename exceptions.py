@@ -1,2 +1,0 @@
-class EmptyResults(Exception):
-   pass
