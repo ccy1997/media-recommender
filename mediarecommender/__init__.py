@@ -5,4 +5,4 @@ class MediaRecommender:
         pass
 
     def run(self):
-        app.run(debug=True)
+        app.run(debug=False)
