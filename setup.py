@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='media-recommender',
-    version='0.0.2',
+    version='0.0.3',
     author='Chung Yin Cheung',
     author_email='cxc574@student.bham.ac.uk',
     description='Media Recommender provides recommendation for movies, videos games and books',
